@@ -1,72 +1,68 @@
-
-const container = document.querySelector('#game-container');
-
-/////////// escena //////////////
-const scene = new THREE.Scene();
-scene.background = new THREE.Color('skyblue');
-
-//////// Cámara perspectiva//////////
-const camera = new THREE.PerspectiveCamera(
-       35, // Fov  (Field, of, view) 1-179
-        container.clientWidth / container.clientHeight, // Aspect
-        0.1, // near
-        1000 // Far
-    
-);
-camera.position.set(0, 0, 10);
-//camera.zoom = 2;
-camera.updateProjectionMatrix(); 
-
-////////////camara ortografica///////////////
-/* let div = 100;
-let camera = new THREE.OrthographicCamera(
- container.clientWidth/div,
- container.clientWidth/-div,
- container.clientHeight/div,
- container.clientHeight/-div,
- .1,
- 1000
-
-);
-camera.position.set(0, 0, 15) */
-
-// Mesh
-const geometry = new THREE.CylinderBufferGeometry(1, 1, 3,8);
-const material = new THREE.MeshBasicMaterial({
-    color: 'teal'
-});
-const cylinder_mesh = new THREE.Mesh(geometry, material);
-cylinder_mesh.rotateZ(THREE.MathUtils.degToRad(90));
-cylinder_mesh.position.set(-3, 0, 0);
-
-scene.add(cylinder_mesh);
+import { PerspectiveCamera, Vector3, WebGLRenderer, sRGBEncoding, OrthographicCamera } from 'three';
 
 
-//mesh 2
-const cylinder_mesh2 = new THREE.Mesh(geometry, material);
-cylinder_mesh2.rotateZ(THREE.MathUtils.degToRad(180));
-cylinder_mesh2.position.set(3, 0, 0);
+import Scene1 from './scenes/Scene1';
 
-scene.add(cylinder_mesh2);
+export class App {
+	constructor(container) {
+		this.container = container;
+		this.camera_pan_up = 40;
+		this.camera_y = 300;
+
+		this.scene = new Scene1();
+
+		// ## Camera's config
+		this.camera = new OrthographicCamera(
+			this.container.clientWidth / -2,
+			this.container.clientWidth / 2,
+			this.container.clientHeight / 2,
+			this.container.clientHeight / -2,
+			-1000, 1000
+		);
+		this.camera.position.set(10, 10 + this.camera_y, 10);
+		this.camera.lookAt(0, this.camera_y, 0);
 
 
+		//this.control = new OrbitControls(this.camera, this.container);
 
-///////HELPER//////
-const helperAxes = new THREE.AxesHelper(1);
-scene.add(helperAxes);
+		// ## Renderer's config
+		this.renderer = new WebGLRenderer({
+			antialias: true,
+		})
+		this.renderer.setPixelRatio(window.devicePixelRatio);
 
-// Render
-const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    canvas: container
-});
-renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
+		// sRGBEncoding
+		this.renderer.outputEncoding = sRGBEncoding;
 
-const update = () => {
-    cylinder_mesh2.rotateX(0.01);
-    cylinder_mesh.rotateY(0.01);
-    renderer.render(scene, camera);
-    renderer.setAnimationLoop(() => update());
+		// ## Light's config
+		this.renderer.physicallyCorrectLights = true;
+
+		this.container.appendChild(this.renderer.domElement);
+		this.onResize();
+		this.render();
+		this.events();
+	}
+	events(){
+
+	}
+
+	onResize() {
+		this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+
+		this.camera.left = this.container.clientWidth / -2;
+		this.camera.right = this.container.clientWidth / 2;
+		this.camera.top = this.container.clientHeight / 2;
+		this.camera.bottom = this.container.clientHeight / -2;
+
+		this.camera.updateProjectionMatrix();
+	}
+
+	render() {
+		this.renderer.render(this.scene, this.camera);
+
+		// Updates here
+		this.scene.update();
+
+		this.renderer.setAnimationLoop(() => this.render());
+	}
 }
-update();
