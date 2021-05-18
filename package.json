@@ -17,5 +17,17 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.0"
-  }
+  },
+  "description": "A simple template for use modules with three.js (JavaScript template)",
+  "main": "webpack.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shingaki-Va/three-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shingaki-Va/three-js/issues"
+  },
+  "homepage": "https://github.com/Shingaki-Va/three-js#readme"
 }
