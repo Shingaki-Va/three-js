@@ -1,13 +1,16 @@
-import { PerspectiveCamera, Vector3, WebGLRenderer, sRGBEncoding, OrthographicCamera } from 'three';
-
-
+import { WebGLRenderer, sRGBEncoding, OrthographicCamera } from 'three';
 import Scene1 from './scenes/Scene1';
+import Observer, { EVENTS } from './Observer';
+
+import * as TWEEN from '@tweenjs/tween.js/dist/tween.umd';
 
 export class App {
 	constructor(container) {
 		this.container = container;
+
 		this.camera_pan_up = 40;
 		this.camera_y = 300;
+
 
 		this.scene = new Scene1();
 
@@ -23,7 +26,7 @@ export class App {
 		this.camera.lookAt(0, this.camera_y, 0);
 
 
-		//this.control = new OrbitControls(this.camera, this.container);
+		// this.control = new OrbitControls(this.camera, this.container);
 
 		// ## Renderer's config
 		this.renderer = new WebGLRenderer({
@@ -42,8 +45,27 @@ export class App {
 		this.render();
 		this.events();
 	}
-	events(){
 
+	events() {
+		Observer.on(EVENTS.STACK, () => {
+			this.camera_y += this.camera_pan_up;
+
+			const camera_up = new TWEEN.Tween(this.camera.position)
+				.to({
+					y: 10 + this.camera_y
+				}, 500)
+				.easing(TWEEN.Easing.Sinusoidal.In);
+			camera_up.start();
+
+		});
+
+		Observer.on(EVENTS.START, () => {
+
+		});
+
+		Observer.on(EVENTS.GAME_OVER, () => {
+
+		});
 	}
 
 	onResize() {
